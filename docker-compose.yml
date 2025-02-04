@@ -1,18 +1,21 @@
-version: "3"
+version: '3'
 services:
   postgres:
-    image: "postgres:latest"
+    image: 'postgres:latest'
     environment:
       - POSTGRES_PASSWORD=postgres_password
   redis:
-    image: "redis:latest"
+    image: 'redis:latest'
   nginx:
+    depends_on:
+      - api
+      - client
     restart: always
     build:
       dockerfile: Dockerfile.dev
       context: ./nginx
     ports:
-      - "3050:80"
+      - '3050:80'
   api:
     build:
       dockerfile: Dockerfile.dev
@@ -29,14 +32,14 @@ services:
       - PGPASSWORD=postgres_password
       - PGPORT=5432
   client:
+    environment:
+      - WDS_SOCKET_PORT=0
     build:
       dockerfile: Dockerfile.dev
       context: ./client
     volumes:
       - /app/node_modules
       - ./client:/app
-    environment:
-      - WDS_SOCKET_PORT=0
   worker:
     build:
       dockerfile: Dockerfile.dev
@@ -47,27 +50,3 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-
-
-# The solution is to set an environment variable on the client service in the docker-compose.yml:
-#   client:
-#     environment:
-#       - WDS_SOCKET_PORT=0
-# Then, in the nginx/default.conf change this line:
-
-#   location /sockjs-node {
-
-# to this:
-
-#   location /ws {
-
-
-
-# Here is the full block of code for context:
-
-#   location /ws {
-#       proxy_pass http://client;
-#       proxy_http_version 1.1;
-#       proxy_set_header Upgrade $http_upgrade;
-#       proxy_set_header Connection "Upgrade";
-#   }
