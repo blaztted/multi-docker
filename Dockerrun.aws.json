@@ -1,0 +1,23 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions:": [
+        {
+            "name": "client",
+            "image": "blaztted/multi-docker-client",
+            "hostname": "client",
+            "essential": false
+        },
+        {
+            "name": "server",
+            "image": "blaztted/multi-docker-server",
+            "hostname": "api",
+            "essential": false
+        },
+        {
+            "name": "worker",
+            "image": "blaztted/multi-docker-worker",
+            "hostname": "worker",
+            "essential": false
+        }
+    ]
+}
